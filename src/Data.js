@@ -79,15 +79,17 @@ class Data{
     return new Promise((resolve)=>{
       this.axios.post('/applogin/loginfo2.php', {},{
         headers:{access_token: this.this__.$An2_Link.get('access_token')}
-      }).then(res => {
-        res = res.data;
+      }).then(res=>{
+        res=res.data;
         res.returncode = parseInt(res.returncode);
-        if (res.returncode == 0){
+        if(res.returncode == 0){
           res.loginUser.sex = parseInt(res.loginUser.sex);
           res.loginUser.iscompleted = parseInt(res.loginUser.iscompleted);
+          res.loginUser.ccidlist = res.ccidlist;
+          res.loginUser.returncode = res.returncode;
           this.user_id = res.loginUser.userid;
-          this.user(res.loginUser.userid);
-          this.this__.$store.commit('login',res);
+          this.user(this.user_id);
+          this.this__.$store.commit('login',res.loginUser);
         }else{
           this.this__.$store.commit('login', {});
           console.error(res);
@@ -202,6 +204,7 @@ class Data{
   {
     return new Promise((resolve)=>{
       this.repeatedly_(5).then(res=>{
+        console.log(this.this__.$store.state);
         if(res){
           let data = this.this__.$store.state.loginUser;
           let res_data ={
