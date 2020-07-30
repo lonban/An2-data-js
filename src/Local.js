@@ -1,33 +1,15 @@
 class Local {
 
   name_='an_';
-  name_is_=0;
   max_length_=1500;
   separator_='_;_';
 
   user(user_id)
   {
     if(user_id){
-      this.name_ += user_id;
+      this.name_+=user_id;
+      this.user_id=user_id;
     }
-    this.name_is_ = 1;
-  }
-
-  callback_()
-  {
-    return new Promise((resolve)=>{
-      let interval_i = 0;
-      let interval = setInterval(()=>{
-        if(this.name_is_){
-          clearInterval(interval);
-          resolve(1);
-        }else{
-          if(interval_i++>20){
-            this.name_is_ = 1;
-          }
-        }
-      },200);
-    });
   }
 
   /*创建本地缓存*/
@@ -49,7 +31,7 @@ class Local {
   createStorage(name, data, time)
   {
     return new Promise((resolve)=>{
-      this.callback_().then(res=>{
+      this.repeatedly_(5).then(res=>{
         if(res){
           resolve(this.createStorage_(name, data, time));
         }
@@ -57,7 +39,7 @@ class Local {
     });
   }
 
-  /*在原数据基础上从后面追加*/
+  /*在原数据基础上从后面追加,time为秒*/
   addStorage_(name, data, time) {
     switch (Object.prototype.toString.call(data)) {
       case '[object Object]':
@@ -81,7 +63,7 @@ class Local {
 
   addStorage(name, data, time){
     return new Promise((resolve)=>{
-      this.callback_().then(res=>{
+      this.repeatedly_(5).then(res=>{
         if(res){
           resolve(this.addStorage_(name, data, time));
         }
@@ -128,7 +110,7 @@ class Local {
   getStorage(name, id)
   {
     return new Promise((resolve)=>{
-      this.callback_().then(res=>{
+      this.repeatedly_(5).then(res=>{
         if(res){
           resolve(this.getStorage_(name, id));
         }
@@ -159,7 +141,7 @@ class Local {
   deleteStorage(name,id)
   {
     return new Promise((resolve)=>{
-      this.callback_().then(res=>{
+      this.repeatedly_(5).then(res=>{
         if(res){
           resolve(this.deleteStorage_(name,id));
         }

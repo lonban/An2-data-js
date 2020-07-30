@@ -31,6 +31,9 @@ function copyProperties(target, source) {
 }
 
 class Index extends mix(Local, Data) {
+  user_id=0; //在调用了login登录之后才会有
+  is_repeatedly_=0; //开始请求时为真，避免多个重复请求
+
   constructor()
   {
     super();
@@ -40,6 +43,36 @@ class Index extends mix(Local, Data) {
   {
     this.this__ = this_;
     return this;
+  }
+
+  /*反复获取user_id获取不到超出number次后重新登录*/
+  repeatedly_(number)
+  {
+    number = number||10;
+    return new Promise((resolve)=>{
+      let interval_i = 0;
+      let interval = setInterval(()=>{
+        if(this.user_id){
+          clearInterval(interval);
+          resolve(1);
+        }else{
+          if(interval_i++>number){//实在没有就调登录来获取
+            if(!this.is_repeatedly_){//避免多个地方同时调用而产生多个循环
+              this.is_repeatedly_ = 1;
+              this.login().then(()=>{
+                this.is_repeatedly_ = 1;
+                clearInterval(interval);
+                console.info('repeatedly_登录完成');
+              }).catch(err=>{
+                this.is_repeatedly_ = 1;
+                clearInterval(interval);
+                console.error(err);
+              });
+            }
+          }
+        }
+      },400);
+    });
   }
 }
 
